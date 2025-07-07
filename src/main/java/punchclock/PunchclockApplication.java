@@ -1,7 +1,7 @@
 package punchclock;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,63 +10,54 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import punchclock.domain.Category;
 import punchclock.domain.Entry;
-import punchclock.domain.EntryCategory;
+import punchclock.domain.Tag;
+import punchclock.repository.CategoryRepository;
 import punchclock.repository.EntryRepository;
-
+import punchclock.repository.TagRepository;
 
 @SpringBootApplication
 public class PunchclockApplication {
 	private static final Logger log = LoggerFactory.getLogger(PunchclockApplication.class);
-	
+
 	public static void main(String[] args) {
 		SpringApplication.run(PunchclockApplication.class, args);
 	}
-	
+
 	@Bean
-	public CommandLineRunner demo(EntryRepository repository) {
+	public CommandLineRunner demo(
+			EntryRepository entryRepository,
+			CategoryRepository categoryRepository,
+			TagRepository tagRepository) {
 		return (args) -> {
-			// save a couple of customers
-			Entry e1 = new Entry(LocalDateTime.now(), LocalDateTime.now());
-			Entry e2 = new Entry(LocalDateTime.now(), LocalDateTime.now());
-			Entry e3 = new Entry(LocalDateTime.now(), LocalDateTime.now());
-			Entry e4 = new Entry(LocalDateTime.now(), LocalDateTime.now(), EntryCategory.FIX);
-			Entry e5 = new Entry(LocalDateTime.now(), LocalDateTime.now(), EntryCategory.FIX);
-			repository.save(e1);
-			repository.save(e2);
-			repository.save(e3);
-			repository.save(e4);
-			repository.save(e5);
-						
-			// fetch all customers
-			log.info("Entries found with findAll():");
-			log.info("-------------------------------");
-			for (Entry entry : repository.findAll()) {
-				log.info(entry.toString());
-			}
-			log.info("");
+			// Categories
+			Category catWork = new Category("Arbeit");
+			Category catBreak = new Category("Pause");
+			categoryRepository.saveAll(List.of(catWork, catBreak));
 
-//			// fetch an individual customer by ID
-//			repository.findById(1).ifPresent(customer -> {
-//				log.info("Customer found with findById(1L):");
-//				log.info("--------------------------------");
-//				log.info(customer.toString());
-//				log.info("");
-//			});
-//
-//			// fetch customers by last name
-//			log.info("Customer found with findByLastName('Bauer'):");
-//			log.info("--------------------------------------------");
-//			repository.findByLastname("Bauer").forEach(bauer -> {
-//				log.info(bauer.toString());
-//			});
-//			// for (Customer bauer : repository.findByLastName("Bauer")) {
-//			// log.info(bauer.toString());
-//			// }
-//			log.info("customers");
+			// Tags
+			Tag tagUrgent = new Tag("Dringend");
+			Tag tagOptional = new Tag("Optional");
+			tagRepository.saveAll(List.of(tagUrgent, tagOptional));
 
-			
+			// Entries
+			Entry e1 = new Entry(LocalDateTime.now().minusHours(3), LocalDateTime.now());
+			e1.setCategory(catWork);
+			e1.setTags(List.of(tagUrgent));
 
+			Entry e2 = new Entry(LocalDateTime.now().minusHours(2), LocalDateTime.now());
+			e2.setCategory(catBreak);
+			e2.setTags(List.of(tagOptional));
+
+			Entry e3 = new Entry(LocalDateTime.now().minusHours(1), LocalDateTime.now());
+			e3.setCategory(catWork);
+			e3.setTags(List.of(tagUrgent, tagOptional));
+
+			entryRepository.saveAll(List.of(e1, e2, e3));
+
+			log.info("Testdaten geladen:");
+			entryRepository.findAll().forEach(entry -> log.info(entry.toString()));
 		};
 	}
 }
