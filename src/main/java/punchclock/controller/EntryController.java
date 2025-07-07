@@ -66,6 +66,8 @@ public class EntryController {
     }
 
     private Entry toEntity(EntryDTO dto) {
-        return new Entry(dto.getId(), dto.getCheckIn(), dto.getCheckOut());
+        Entry entry = new Entry(dto.getCheckIn(), dto.getCheckOut());
+        entry.setId(dto.getId()); // falls ID nötig
+        return entry;
     }
 }

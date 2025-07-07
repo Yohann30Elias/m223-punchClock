@@ -2,14 +2,9 @@ package punchclock.domain;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Entry {
@@ -24,18 +19,15 @@ public class Entry {
 	@Column(nullable = false)
 	private LocalDateTime checkOut;
 
-	@Enumerated(EnumType.STRING)
-	private EntryCategory category;
-
 	private String comment;
 
-	public Entry() {
-	}
+	@ManyToOne
+	private Category category;
 
-	public Entry(Long id, LocalDateTime checkIn, LocalDateTime checkOut) {
-		this.id = id;
-		this.checkIn = checkIn;
-		this.checkOut = checkOut;
+	@ManyToMany
+	private List<Tag> tags;
+
+	public Entry() {
 	}
 
 	public Entry(LocalDateTime checkIn, LocalDateTime checkOut) {
@@ -43,10 +35,14 @@ public class Entry {
 		this.checkOut = checkOut;
 	}
 
-	public Entry(LocalDateTime checkIn, LocalDateTime checkOut, EntryCategory category) {
+	/**
+	 * Falls du EntryCategory noch in PunchclockApplication nutzt:
+	 * Speichere den Enum-Typ als Text im Comment.
+	 */
+	public Entry(LocalDateTime checkIn, LocalDateTime checkOut, EntryCategory entryCategory) {
 		this.checkIn = checkIn;
 		this.checkOut = checkOut;
-		this.category = category;
+		this.comment = entryCategory != null ? entryCategory.name() : null;
 	}
 
 	public Long getId() {
@@ -73,12 +69,20 @@ public class Entry {
 		this.checkOut = checkOut;
 	}
 
-	public EntryCategory getCategory() {
+	public Category getCategory() {
 		return category;
 	}
 
-	public void setCategory(EntryCategory category) {
+	public void setCategory(Category category) {
 		this.category = category;
+	}
+
+	public List<Tag> getTags() {
+		return tags;
+	}
+
+	public void setTags(List<Tag> tags) {
+		this.tags = tags;
 	}
 
 	public String getComment() {
