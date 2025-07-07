@@ -2,10 +2,11 @@ package punchclock.domain;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale.Category;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -17,54 +18,34 @@ public class Entry {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-//	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
-//	@JsonSerialize(using = LocalDateTimeSerializer.class)
 	@Column(nullable = false)
 	private LocalDateTime checkIn;
 
-//	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
-//	@JsonSerialize(using = LocalDateTimeSerializer.class)
 	@Column(nullable = false)
 	private LocalDateTime checkOut;
 
+	@Enumerated(EnumType.STRING)
 	private EntryCategory category;
 
 	private String comment;
 
-
 	public Entry() {
-		super();
-		// TODO Auto-generated constructor stub
+	}
+
+	public Entry(Long id, LocalDateTime checkIn, LocalDateTime checkOut) {
+		this.id = id;
+		this.checkIn = checkIn;
+		this.checkOut = checkOut;
 	}
 
 	public Entry(LocalDateTime checkIn, LocalDateTime checkOut) {
-		super();
 		this.checkIn = checkIn;
 		this.checkOut = checkOut;
 	}
 
-	public Entry(LocalDateTime checkIn, LocalDateTime checkOut, EntryCategory cat) {
-		super();
+	public Entry(LocalDateTime checkIn, LocalDateTime checkOut, EntryCategory category) {
 		this.checkIn = checkIn;
 		this.checkOut = checkOut;
-		this.category = cat;
-	}
-
-
-	public String getComment() {
-		return comment;
-	}
-
-	public void setComment(String comment) {
-		this.comment = comment;
-	}
-
-
-	public EntryCategory getCategory() {
-		return category;
-	}
-
-	public void setCategory(EntryCategory category) {
 		this.category = category;
 	}
 
@@ -92,10 +73,27 @@ public class Entry {
 		this.checkOut = checkOut;
 	}
 
+	public EntryCategory getCategory() {
+		return category;
+	}
+
+	public void setCategory(EntryCategory category) {
+		this.category = category;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+
 	@Override
 	public String toString() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy / HH:mm:ss");
-		return "Entry [id=" + id + ", checkIn=" + checkIn.format(formatter) + ", checkOut=" + checkOut.format(formatter) + "]";
+		return "Entry [id=" + id +
+				", checkIn=" + checkIn.format(formatter) +
+				", checkOut=" + checkOut.format(formatter) + "]";
 	}
-
 }
